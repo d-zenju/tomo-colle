@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>トモダチコレクション 自己紹介帳</title>
+  <style>
+    :root {
+      --blue: #4a90d9;
+      --blue-dark: #2976bc;
+      --blue-light: #87ceeb;
+      --bg: #d6eef8;
+      --card-bg: #ffffff;
+      --text: #2c3e50;
+      --pink: #ff6b9d;
+      --green: #27ae60;
+      --red: #e74c3c;
+      --yellow: #f39c12;
+      --purple: #9b59b6;
+      --shadow: rgba(0,0,0,0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Helvetica Neue', 'Yu Gothic UI', 'Meiryo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: linear-gradient(160deg, #5ba3e8 0%, #3178c6 50%, #2160a8 100%);
+      color: white;
+      padding: 14px 20px 10px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header h1 {
+      font-size: 1.25em;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 1px 2px 4px rgba(0,0,0,0.3);
+    }
+    .header p {
+      font-size: 0.72em;
+      opacity: 0.85;
+      margin-top: 2px;
+      letter-spacing: 1px;
+    }
+
+    /* ===== NAV ===== */
+    .nav {
+      display: flex;
+      background: white;
+      box-shadow: 0 2px 6px var(--shadow);
+    }
+    .nav-btn {
+      flex: 1;
+      padding: 11px 8px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: #999;
+      transition: all 0.2s;
+      border-bottom: 3px solid transparent;
+    }
+    .nav-btn.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+    }
+    .nav-btn:hover:not(.active) { background: #f5f5f5; }
+
+    /* ===== CONTENT ===== */
+    .content {
+      max-width: 940px;
+      margin: 0 auto;
+      padding: 20px 14px 40px;
+    }
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ===== SECTION HEADER ===== */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 1.05em;
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    /* ===== FRIEND CARDS ===== */
+    .friends-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 14px;
+    }
+    .friend-card {
+      background: white;
+      border-radius: 18px;
+      padding: 20px 16px 16px;
+      box-shadow: 0 3px 10px var(--shadow);
+      cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s;
+      border: 2px solid transparent;
+    }
+    .friend-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 22px var(--shadow);
+      border-color: var(--blue-light);
+    }
+    .card-avatar {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7em;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.25);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+    .card-name { font-size: 1.05em; font-weight: bold; text-align: center; }
+    .card-nickname { color: #aaa; font-size: 0.8em; text-align: center; margin: 2px 0 10px; }
+    .card-tagline {
+      font-size: 0.82em;
+      color: #555;
+      text-align: center;
+      background: #f0f8ff;
+      padding: 8px 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      line-height: 1.45;
+    }
+    .personality-badge {
+      display: inline-block;
+      font-size: 0.68em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .group-まったり系    { background: #fef9c3; color: #854d0e; }
+    .group-エネルギッシュ系 { background: #fee2e2; color: #991b1b; }
+    .group-インテリ系    { background: #dbeafe; color: #1e40af; }
+    .group-フリーダム系  { background: #d1fae5; color: #065f46; }
+
+    /* ===== FORM ===== */
+    .form-card {
+      background: white;
+      border-radius: 18px;
+      padding: 24px 22px;
+      box-shadow: 0 3px 10px var(--shadow);
+    }
+    .form-title { font-size: 1.15em; font-weight: bold; color: var(--blue); margin-bottom: 20px; }
+    .form-section-label {
+      font-size: 0.82em;
+      font-weight: bold;
+      color: var(--blue);
+      margin: 22px 0 10px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid var(--bg);
+      letter-spacing: 1px;
+    }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block;
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .required { color: var(--pink); margin-left: 2px; }
+    .form-control {
+      width: 100%;
+      padding: 9px 12px;
+      border: 2px solid #e5e5e5;
+      border-radius: 9px;
+      font-size: 0.92em;
+      transition: border-color 0.2s;
+      background: white;
+      color: var(--text);
+    }
+    .form-control:focus { outline: none; border-color: var(--blue); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ===== QUIZ ===== */
+    .quiz-box {
+      background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
+      border: 2px solid #bae6fd;
+      border-radius: 14px;
+      padding: 16px;
+      margin: 4px 0 14px;
+    }
+    .quiz-box h3 {
+      font-size: 0.88em;
+      font-weight: bold;
+      color: var(--blue-dark);
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .slider-group { margin-bottom: 14px; }
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8em;
+      margin-bottom: 3px;
+    }
+    .slider-label strong { color: var(--text); }
+    .slider-val {
+      background: var(--blue);
+      color: white;
+      font-size: 0.78em;
+      font-weight: bold;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slider-hints {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68em;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue);
+      cursor: pointer;
+    }
+    .quiz-result {
+      background: white;
+      border-radius: 10px;
+      padding: 14px 12px;
+      margin-top: 12px;
+      text-align: center;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .quiz-result.show { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .result-type { font-size: 1.05em; font-weight: bold; color: var(--blue); }
+    .result-group { font-size: 0.75em; color: #888; margin: 4px 0; }
+    .result-desc { font-size: 0.82em; color: #555; line-height: 1.5; margin-top: 6px; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 0.88em;
+      font-weight: bold;
+      transition: all 0.18s;
+      text-decoration: none;
+    }
+    .btn-primary   { background: var(--blue);   color: white; }
+    .btn-primary:hover   { background: var(--blue-dark); }
+    .btn-success   { background: var(--green);  color: white; }
+    .btn-success:hover   { background: #219150; }
+    .btn-danger    { background: var(--red);    color: white; }
+    .btn-danger:hover    { background: #c0392b; }
+    .btn-secondary { background: #95a5a6;       color: white; }
+    .btn-secondary:hover { background: #7f8c8d; }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--blue);
+      color: var(--blue);
+    }
+    .btn-outline:hover { background: var(--blue); color: white; }
+    .btn-sm { padding: 6px 14px; font-size: 0.78em; }
+    .btn-block { width: 100%; }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.48);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 22px;
+      padding: 28px 24px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: #f0f0f0;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 1em;
+      color: #666;
+      transition: background 0.2s;
+    }
+    .modal-close:hover { background: #e0e0e0; }
+    .modal-avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      font-weight: bold;
+      color: white;
+      margin: 0 auto 12px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.25);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    }
+    .modal-name { font-size: 1.25em; font-weight: bold; text-align: center; }
+    .modal-nickname { color: #aaa; font-size: 0.82em; text-align: center; margin: 3px 0 10px; }
+    .modal-tagline {
+      background: #f0f8ff;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.88em;
+      font-style: italic;
+      color: #444;
+      line-height: 1.5;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .detail-row {
+      display: flex;
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px solid #f4f4f4;
+      font-size: 0.87em;
+    }
+    .detail-label { width: 110px; flex-shrink: 0; color: #999; }
+    .detail-value { color: var(--text); font-weight: 500; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .modal-actions .btn { flex: 1; }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 56px 20px;
+      color: #bbb;
+      grid-column: 1 / -1;
+    }
+    .empty-state .empty-icon { font-size: 4em; margin-bottom: 14px; }
+    .empty-state p { font-size: 0.92em; margin-top: 4px; }
+
+    /* ===== LOADING ===== */
+    .loading { text-align: center; padding: 50px; color: #aaa; grid-column: 1 / -1; }
+    .spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 4px solid #e0e0e0;
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #333;
+      color: white;
+      padding: 11px 24px;
+      border-radius: 24px;
+      font-size: 0.88em;
+      font-weight: bold;
+      transition: transform 0.28s ease;
+      z-index: 400;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: var(--green); }
+    .toast.error   { background: var(--red); }
+
+    /* ===== CONFIRM DIALOG ===== */
+    .confirm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+    }
+    .confirm-overlay.show { display: flex; }
+    .confirm-box {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 320px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    }
+    .confirm-box p { font-size: 0.95em; margin-bottom: 20px; line-height: 1.5; }
+    .confirm-actions { display: flex; gap: 10px; }
+    .confirm-actions .btn { flex: 1; }
+  </style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<div class="header">
+  <h1>🏘️ トモダチコレクション 自己紹介帳</h1>
+  <p>みんなのじこしょうかいをみてみよう！</p>
+</div>
+
+<!-- ナビ -->
+<div class="nav">
+  <button class="nav-btn active" onclick="showView('list')" id="nav-list">👥 トモダチ一覧</button>
+  <button class="nav-btn" onclick="showView('register')" id="nav-register">✏️ じこしょうかい登録</button>
+</div>
+
+<div class="content">
+
+  <!-- ===== 一覧ビュー ===== -->
+  <div id="view-list" class="view active">
+    <div class="section-header">
+      <span class="section-title" id="friends-count">トモダチ一覧</span>
+      <button class="btn btn-primary btn-sm" onclick="showRegisterNew()">＋ 追加</button>
+    </div>
+    <div id="friends-grid" class="friends-grid">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- ===== 登録ビュー ===== -->
+  <div id="view-register" class="view">
+    <div class="form-card">
+      <div class="form-title" id="form-title">✏️ 新しいトモダチを登録しよう</div>
+      <form id="friend-form" onsubmit="submitForm(event)">
+        <input type="hidden" id="edit-id" value="">
+
+        <div class="form-section-label">📝 きほんじょうほう</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>なまえ<span class="required">*</span></label>
+            <input type="text" id="f-name" class="form-control" placeholder="山田 太郎" required>
+          </div>
+          <div class="form-group">
+            <label>ニックネーム<span class="required">*</span></label>
+            <input type="text" id="f-nickname" class="form-control" placeholder="たろう" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>たんじょうび<span class="required">*</span></label>
+            <input type="date" id="f-birthdate" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>けつえきがた<span class="required">*</span></label>
+            <select id="f-blood_type" class="form-control" required>
+              <option value="">えらんでね</option>
+              <option value="A">A型</option>
+              <option value="B">B型</option>
+              <option value="AB">AB型</option>
+              <option value="O">O型</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>ひとことじこしょうかい<span class="required">*</span></label>
+          <input type="text" id="f-tagline" class="form-control" placeholder="いつも眠いWebエンジニアです。" required>
+        </div>
+
+        <div class="form-section-label">🍎 すきなもの</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>すきなたべもの</label>
+            <input type="text" id="f-favorite_food" class="form-control" placeholder="ラーメン">
+          </div>
+          <div class="form-group">
+            <label>すきなこと・もの</label>
+            <input type="text" id="f-favorite_thing" class="form-control" placeholder="二度寝">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>しゅみ</label>
+          <input type="text" id="f-hobby" class="form-control" placeholder="ゲーム開発">
+        </div>
+
+        <div class="form-section-label">🔮 せいかくしんだん（任意）</div>
+        <div class="quiz-box">
+          <h3>🎯 4つのしつもんに答えてせいかくをしんだん！</h3>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <strong>行動の早さ</strong>
+              <div class="slider-val" id="pace-val">3</div>
+            </div>
+            <input type="range" id="q-pace" min="1" max="5" value="3"
+              oninput="updateSlider('pace', this.value)">
+            <div class="slider-hints"><span>🐢 のんびり</span><span>てきぱき ⚡</span></div>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <strong>社交性</strong>
+              <div class="slider-val" id="sociability-val">3</div>
+            </div>
+            <input type="range" id="q-sociability" min="1" max="5" value="3"
+              oninput="updateSlider('sociability', this.value)">
+            <div class="slider-hints"><span>🏠 ソロ好き</span><span>ワイワイ好き 🎉</span></div>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <strong>思考スタイル</strong>
+              <div class="slider-val" id="focus-val">3</div>
+            </div>
+            <input type="range" id="q-focus" min="1" max="5" value="3"
+              oninput="updateSlider('focus', this.value)">
+            <div class="slider-hints"><span>💫 直感・感覚</span><span>論理・思考 🧠</span></div>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <strong>行動パターン</strong>
+              <div class="slider-val" id="attitude-val">3</div>
+            </div>
+            <input type="range" id="q-attitude" min="1" max="5" value="3"
+              oninput="updateSlider('attitude', this.value)">
+            <div class="slider-hints"><span>🌊 おおまか・自由</span><span>几帳面・きっちり 📋</span></div>
+          </div>
+
+          <button type="button" class="btn btn-outline btn-block" style="margin-top:10px"
+            onclick="runDiagnosis()">🔍 しんだんする</button>
+
+          <div id="quiz-result" class="quiz-result">
+            <div class="result-type" id="result-type"></div>
+            <div class="result-group" id="result-group"></div>
+            <div class="result-desc" id="result-desc"></div>
+            <button type="button" class="btn btn-success btn-sm" style="margin-top:12px"
+              onclick="useResult()">✅ このせいかくをつかう</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>せいかくタイプ</label>
+          <input type="text" id="f-personality_type" class="form-control"
+            placeholder="しんだんして決めよう！（にゅうりょくもできます）">
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:22px">
+          <button type="submit" class="btn btn-primary" style="flex:1" id="submit-btn">
+            💾 とうろくする
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="cancelForm()">もどる</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- ===== 詳細モーダル ===== -->
+<div id="modal-overlay" class="modal-overlay" onclick="onOverlayClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-avatar" class="modal-avatar"></div>
+    <div class="modal-name" id="modal-name"></div>
+    <div class="modal-nickname" id="modal-nickname"></div>
+    <div style="text-align:center;margin-bottom:12px" id="modal-personality"></div>
+    <div class="modal-tagline" id="modal-tagline"></div>
+    <div id="modal-details"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="editCurrentFriend()">✏️ へんしゅう</button>
+      <button class="btn btn-danger" onclick="showConfirm()">🗑️ さくじょ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 削除確認ダイアログ ===== -->
+<div id="confirm-overlay" class="confirm-overlay">
+  <div class="confirm-box">
+    <p id="confirm-msg"></p>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary" onclick="closeConfirm()">キャンセル</button>
+      <button class="btn btn-danger" onclick="doDelete()">さくじょ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== トースト ===== -->
+<div id="toast" class="toast"></div>
+
+<script>
+  const API_BASE = '';  // 同一オリジン
+
+  const AVATAR_COLORS = [
+    '#4a90d9','#e74c3c','#27ae60','#f39c12',
+    '#9b59b6','#1abc9c','#e67e22','#16a085',
+    '#8e44ad','#d35400','#2980b9','#c0392b'
+  ];
+
+  const PERSONALITY_GROUPS = {
+    'ひだまりの居眠り職人': 'まったり系',
+    'ほのぼの系聞き上手': 'まったり系',
+    '心優しきグリーンフィンガー': 'まったり系',
+    '直感型スピードスター': 'エネルギッシュ系',
+    'お祭り騒ぎの仕掛け人': 'エネルギッシュ系',
+    '涙もろきパッションリーダー': 'エネルギッシュ系',
+    'ポーカーフェイスの戦略家': 'インテリ系',
+    '歩く知識の図書館': 'インテリ系',
+    'スマートな解決屋': 'インテリ系',
+    '神出鬼没のアイデアマン': 'フリーダム系',
+    'マイペースな芸術家': 'フリーダム系',
+    'のほほん宇宙人': 'フリーダム系'
+  };
+
+  let friends = [];
+  let currentFriend = null;
+  let lastDiagnosis = null;
+
+  // ===== ユーティリティ =====
+  function esc(s) {
+    return String(s ?? '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function avatarColor(name) {
+    let h = 0;
+    for (const c of String(name)) h = (h << 5) - h + c.charCodeAt(0);
+    return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+  }
+
+  function getGroup(type) {
+    return PERSONALITY_GROUPS[type] || '';
+  }
+
+  function formatDate(d) {
+    if (!d) return '—';
+    const [y, m, day] = d.split('-');
+    return `${y}年${+m}月${+day}日`;
+  }
+
+  function calcAge(birthdate) {
+    if (!birthdate) return null;
+    const now = new Date();
+    const bd = new Date(birthdate);
+    let age = now.getFullYear() - bd.getFullYear();
+    const mo = now.getMonth() - bd.getMonth();
+    if (mo < 0 || (mo === 0 && now.getDate() < bd.getDate())) age--;
+    return age;
+  }
+
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast show ${type}`;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
+  }
+
+  // ===== ナビゲーション =====
+  function showView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`view-${name}`).classList.add('active');
+    document.getElementById(`nav-${name}`).classList.add('active');
+    if (name === 'list') loadFriends();
+  }
+
+  function showRegisterNew() {
+    resetForm();
+    showView('register');
+  }
+
+  // ===== トモダチ一覧 =====
+  async function loadFriends() {
+    const grid = document.getElementById('friends-grid');
+    grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    try {
+      const res = await fetch(`${API_BASE}/api/friends`);
+      if (!res.ok) throw new Error();
+      friends = await res.json();
+      renderFriends();
+    } catch {
+      grid.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <p>データのしゅとくにしっぱいしました</p>
+        <p>サーバーがきどうしているか確認してください</p>
+      </div>`;
+    }
+  }
+
+  function renderFriends() {
+    const grid = document.getElementById('friends-grid');
+    document.getElementById('friends-count').textContent = `トモダチ一覧（${friends.length}人）`;
+
+    if (friends.length === 0) {
+      grid.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">🏡</div>
+        <p>まだトモダチがいません</p>
+        <p style="margin-top:6px;font-size:0.85em">「＋ 追加」ボタンからとうろくしよう！</p>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = friends.map(f => {
+      const color = avatarColor(f.name);
+      const initial = [...f.name][0];
+      const group = getGroup(f.personality_type);
+      const badge = f.personality_type
+        ? `<div style="text-align:center;margin-top:8px">
+             <span class="personality-badge group-${esc(group)}">${esc(f.personality_type)}</span>
+           </div>`
+        : '';
+      return `<div class="friend-card" onclick="showDetail('${esc(f.id)}')">
+        <div class="card-avatar" style="background:${color}">${esc(initial)}</div>
+        <div class="card-name">${esc(f.name)}</div>
+        <div class="card-nickname">@ ${esc(f.nickname)}</div>
+        <div class="card-tagline">「${esc(f.tagline)}」</div>
+        ${badge}
+      </div>`;
+    }).join('');
+  }
+
+  // ===== 詳細モーダル =====
+  function showDetail(id) {
+    currentFriend = friends.find(f => f.id === id);
+    if (!currentFriend) return;
+    const f = currentFriend;
+    const color = avatarColor(f.name);
+    const initial = [...f.name][0];
+
+    document.getElementById('modal-avatar').style.background = color;
+    document.getElementById('modal-avatar').textContent = initial;
+    document.getElementById('modal-name').textContent = f.name;
+    document.getElementById('modal-nickname').textContent = `@ ${f.nickname}`;
+    document.getElementById('modal-tagline').textContent = `「${f.tagline}」`;
+
+    const group = getGroup(f.personality_type);
+    document.getElementById('modal-personality').innerHTML = f.personality_type
+      ? `<span class="personality-badge group-${esc(group)}">${esc(f.personality_type)}</span>`
+      : '<span style="color:#ccc;font-size:0.82em">性格未診断</span>';
+
+    const age = calcAge(f.birthdate);
+    const rows = [
+      ['たんじょうび', formatDate(f.birthdate) + (age !== null ? ` (${age}さい)` : '')],
+      ['けつえきがた', f.blood_type ? f.blood_type + '型' : '—'],
+      ['すきな食べ物', f.favorite_food || '—'],
+      ['すきなこと', f.favorite_thing || '—'],
+      ['しゅみ', f.hobby || '—'],
+    ];
+    document.getElementById('modal-details').innerHTML = rows.map(([label, val]) =>
+      `<div class="detail-row">
+        <span class="detail-label">${esc(label)}</span>
+        <span class="detail-value">${esc(val)}</span>
+      </div>`
+    ).join('');
+
+    document.getElementById('modal-overlay').classList.add('show');
+  }
+
+  function onOverlayClick(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('show');
+  }
+
+  // ===== 編集 =====
+  function editCurrentFriend() {
+    if (!currentFriend) return;
+    closeModal();
+    const f = currentFriend;
+    document.getElementById('edit-id').value = f.id;
+    document.getElementById('f-name').value = f.name;
+    document.getElementById('f-nickname').value = f.nickname;
+    document.getElementById('f-birthdate').value = f.birthdate;
+    document.getElementById('f-blood_type').value = f.blood_type;
+    document.getElementById('f-tagline').value = f.tagline;
+    document.getElementById('f-favorite_food').value = f.favorite_food || '';
+    document.getElementById('f-favorite_thing').value = f.favorite_thing || '';
+    document.getElementById('f-hobby').value = f.hobby || '';
+    document.getElementById('f-personality_type').value = f.personality_type || '';
+    document.getElementById('form-title').textContent = '✏️ トモダチじょうほうをへんしゅう';
+    document.getElementById('submit-btn').textContent = '💾 こうしんする';
+    clearDiagnosis();
+
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('view-register').classList.add('active');
+    document.getElementById('nav-register').classList.add('active');
+  }
+
+  // ===== 削除 =====
+  function showConfirm() {
+    document.getElementById('confirm-msg').textContent =
+      `「${currentFriend?.name}」をさくじょしますか？`;
+    document.getElementById('confirm-overlay').classList.add('show');
+  }
+  function closeConfirm() {
+    document.getElementById('confirm-overlay').classList.remove('show');
+  }
+  async function doDelete() {
+    if (!currentFriend) return;
+    const name = currentFriend.name;
+    closeConfirm();
+    try {
+      const res = await fetch(`${API_BASE}/api/friends/${currentFriend.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        closeModal();
+        currentFriend = null;
+        showToast(`「${name}」をさくじょしました`, 'success');
+        await loadFriends();
+      } else {
+        showToast('さくじょにしっぱいしました', 'error');
+      }
+    } catch {
+      showToast('つうしんエラーがはっせいしました', 'error');
+    }
+  }
+
+  // ===== 性格診断 =====
+  function updateSlider(key, value) {
+    document.getElementById(`${key}-val`).textContent = value;
+    clearDiagnosis();
+  }
+
+  async function runDiagnosis() {
+    const pace        = document.getElementById('q-pace').value;
+    const sociability = document.getElementById('q-sociability').value;
+    const focus       = document.getElementById('q-focus').value;
+    const attitude    = document.getElementById('q-attitude').value;
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/personality?pace=${pace}&sociability=${sociability}&focus=${focus}&attitude=${attitude}`
+      );
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      lastDiagnosis = data;
+      document.getElementById('result-type').textContent = data.personality_type;
+      document.getElementById('result-group').textContent = `【${data.group}】`;
+      document.getElementById('result-desc').textContent = data.description;
+      document.getElementById('quiz-result').classList.add('show');
+    } catch {
+      showToast('しんだんにしっぱいしました', 'error');
+    }
+  }
+
+  function clearDiagnosis() {
+    lastDiagnosis = null;
+    document.getElementById('quiz-result').classList.remove('show');
+  }
+
+  function useResult() {
+    if (!lastDiagnosis) return;
+    document.getElementById('f-personality_type').value = lastDiagnosis.personality_type;
+    showToast(`「${lastDiagnosis.personality_type}」をセットしました！`, 'success');
+  }
+
+  // ===== フォーム送信 =====
+  async function submitForm(e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-id').value;
+
+    const body = {
+      name:             document.getElementById('f-name').value.trim(),
+      nickname:         document.getElementById('f-nickname').value.trim(),
+      birthdate:        document.getElementById('f-birthdate').value,
+      blood_type:       document.getElementById('f-blood_type').value,
+      tagline:          document.getElementById('f-tagline').value.trim(),
+      favorite_food:    document.getElementById('f-favorite_food').value.trim() || undefined,
+      favorite_thing:   document.getElementById('f-favorite_thing').value.trim() || undefined,
+      hobby:            document.getElementById('f-hobby').value.trim() || undefined,
+      personality_type: document.getElementById('f-personality_type').value.trim() || undefined,
+    };
+    Object.keys(body).forEach(k => body[k] === undefined && delete body[k]);
+
+    const url    = id ? `${API_BASE}/api/friends/${id}` : `${API_BASE}/api/friends`;
+    const method = id ? 'PUT' : 'POST';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        showToast(id ? 'こうしんしました！' : 'とうろくしました！', 'success');
+        resetForm();
+        showView('list');
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast(err.message || 'エラーがはっせいしました', 'error');
+      }
+    } catch {
+      showToast('つうしんエラーがはっせいしました', 'error');
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('friend-form').reset();
+    document.getElementById('edit-id').value = '';
+    document.getElementById('form-title').textContent = '✏️ 新しいトモダチを登録しよう';
+    document.getElementById('submit-btn').textContent = '💾 とうろくする';
+    document.getElementById('f-personality_type').value = '';
+    ['pace','sociability','focus','attitude'].forEach(k => {
+      const el = document.getElementById(`q-${k}`);
+      if (el) { el.value = 3; document.getElementById(`${k}-val`).textContent = '3'; }
+    });
+    clearDiagnosis();
+  }
+
+  function cancelForm() {
+    resetForm();
+    showView('list');
+  }
+
+  // 初回ロード
+  loadFriends();
+</script>
+</body>
+</html>

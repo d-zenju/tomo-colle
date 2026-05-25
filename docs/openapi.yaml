@@ -1,0 +1,367 @@
+openapi: 3.0.0
+info:
+  title: トモダチ自己紹介 & 性格診断 API
+  description: |
+    トモダチコレクション風の自己紹介REST APIと、オリジナルのバラエティ性格診断APIの仕様書です。
+    
+    ### 1. 自己紹介API (`/api/friends`)
+    住人（トモダチ）の自己紹介情報をCRUD操作（作成・取得・更新・削除）するためのREST API。
+    
+    ### 2. 性格診断API (`/api/personality`)
+    4つのパラメータ（行動の早さ、社交性、思考、態度）をもとに、独自の12種類の性格から診断結果を判定するAPI。
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: ローカル開発サーバー
+paths:
+  /api/friends:
+    get:
+      summary: トモダチ一覧の取得
+      description: 登録されているすべてのトモダチの自己紹介情報を取得します。
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Friend'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: 新しいトモダチの登録
+      description: 新しいトモダチの自己紹介情報を登録します。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FriendInput'
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Friend'
+        '400':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/friends/{id}:
+    get:
+      summary: 特定のトモダチの取得
+      description: 指定されたIDのトモダチの自己紹介情報を取得します。
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: トモダチのID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Friend'
+        '404':
+          description: トモダチが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: トモダチの情報の更新
+      description: 指定されたIDのトモダチの情報を更新します。
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: トモダチのID (UUID)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FriendInput'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Friend'
+        '400':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: トモダチが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: トモダチの削除
+      description: 指定されたIDのトモダチの情報を削除します。
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: トモダチのID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: 削除成功（コンテンツなし）
+        '404':
+          description: トモダチが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/personality:
+    get:
+      summary: 性格診断の実行
+      description: |
+        4つの性格診断軸（1〜5の数値）から、オリジナルの性格診断結果を返します。
+      parameters:
+        - name: pace
+          in: query
+          required: true
+          description: "行動の早さ（1: のんびり 〜 5: てきぱき）"
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+        - name: sociability
+          in: query
+          required: true
+          description: "社交性（1: ソロ好き 〜 5: ワイワイ好き）"
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+        - name: focus
+          in: query
+          required: true
+          description: "思考（1: 直感・感覚 〜 5: 論理・思考）"
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+        - name: attitude
+          in: query
+          required: true
+          description: "態度（1: おおまか・自由 〜 5: 几帳面・きっちり）"
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+      responses:
+        '200':
+          description: 診断成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalityResult'
+        '400':
+          description: パラメータエラー（範囲外、または不足）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Friend:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: トモダチの一意のID
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        name:
+          type: string
+          description: トモダチの本名（またはフルネーム）
+          example: 山田 太郎
+        nickname:
+          type: string
+          description: トモダチのニックネーム
+          example: たろう
+        birthdate:
+          type: string
+          format: date
+          description: 生年月日
+          example: "1995-08-15"
+        blood_type:
+          type: string
+          enum: [A, B, AB, O]
+          description: 血液型
+          example: A
+        tagline:
+          type: string
+          description: 一言自己紹介
+          example: いつも眠いWebエンジニアです。
+        favorite_food:
+          type: string
+          description: 好きな食べ物
+          example: ラーメン
+        favorite_thing:
+          type: string
+          description: 好きなこと・もの
+          example: 二度寝
+        hobby:
+          type: string
+          description: 趣味
+          example: ゲーム開発
+        personality_type:
+          type: string
+          description: 性格診断結果の性格タイプ名（省略時は未診断）
+          example: ひだまりの居眠り職人
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+          example: "2026-05-26T00:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+          example: "2026-05-26T00:00:00Z"
+      required:
+        - id
+        - name
+        - nickname
+        - birthdate
+        - blood_type
+        - tagline
+        - created_at
+        - updated_at
+
+    FriendInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: トモダチの本名（またはフルネーム）
+          example: 山田 太郎
+        nickname:
+          type: string
+          description: トモダチのニックネーム
+          example: たろう
+        birthdate:
+          type: string
+          format: date
+          description: 生年月日
+          example: "1995-08-15"
+        blood_type:
+          type: string
+          enum: [A, B, AB, O]
+          description: 血液型
+          example: A
+        tagline:
+          type: string
+          description: 一言自己紹介
+          example: いつも眠いWebエンジニアです。
+        favorite_food:
+          type: string
+          description: 好きな食べ物
+          example: ラーメン
+        favorite_thing:
+          type: string
+          description: 好きなこと・もの
+          example: 二度寝
+        hobby:
+          type: string
+          description: 趣味
+          example: ゲーム開発
+        personality_type:
+          type: string
+          description: 性格診断結果の性格タイプ名
+          example: ひだまりの居眠り職人
+      required:
+        - name
+        - nickname
+        - birthdate
+        - blood_type
+        - tagline
+
+    PersonalityResult:
+      type: object
+      properties:
+        personality_type:
+          type: string
+          description: 性格タイプ名
+          example: ひだまりの居眠り職人
+        group:
+          type: string
+          description: 性格グループ名
+          example: まったり系
+        description:
+          type: string
+          description: 性格の詳しい特徴・説明文
+          example: どこでも寝られる。争いごとが嫌いで、平和と静けさを愛するタイプ。
+      required:
+        - personality_type
+        - group
+        - description
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: エラー内容の詳細メッセージ
+          example: リクエストパラメータが不正です。
+      required:
+        - message
