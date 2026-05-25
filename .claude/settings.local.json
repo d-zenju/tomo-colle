@@ -10,6 +10,7 @@
       "Bash(mv /mnt/c/Users/zenju/work/tomo-colle/openapi.yaml /mnt/c/Users/zenju/work/tomo-colle/docs/openapi.yaml)",
       "Bash(npm install *)",
       "Bash(npm test *)"
+      "Bash(npx vitest *)"
     ]
   }
 }
