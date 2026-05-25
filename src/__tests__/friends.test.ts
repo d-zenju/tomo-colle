@@ -192,6 +192,54 @@ describe('updateFriend', () => {
   });
 });
 
+// ===== createFriend - インジェクション防止 =====
+describe('createFriend - インジェクション防止', () => {
+  it('入力に id が含まれていても無視され、UUIDが生成される', async () => {
+    setupData([]);
+    const injected = { ...INPUT, id: 'injected-id' } as unknown as FriendInput;
+    const result = await createFriend(injected);
+    expect(result.id).not.toBe('injected-id');
+    expect(result.id).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    );
+  });
+
+  it('入力に未知フィールドが含まれていても保存されない', async () => {
+    setupData([]);
+    const injected = { ...INPUT, admin: true, injected: 'evil' } as unknown as FriendInput;
+    const result = await createFriend(injected);
+    expect(result).not.toHaveProperty('admin');
+    expect(result).not.toHaveProperty('injected');
+  });
+});
+
+// ===== updateFriend - インジェクション防止 =====
+describe('updateFriend - インジェクション防止', () => {
+  it('入力に id が含まれていても元の id が保持される', async () => {
+    setupData([FRIEND_A]);
+    const injected = { ...INPUT, id: 'injected-id' } as unknown as FriendInput;
+    const result = await updateFriend(FRIEND_A.id, injected);
+    expect(result).not.toBeNull();
+    expect(result!.id).toBe(FRIEND_A.id);
+  });
+
+  it('入力に created_at が含まれていても元の created_at が保持される', async () => {
+    setupData([FRIEND_A]);
+    const injected = { ...INPUT, created_at: '1970-01-01T00:00:00.000Z' } as unknown as FriendInput;
+    const result = await updateFriend(FRIEND_A.id, injected);
+    expect(result).not.toBeNull();
+    expect(result!.created_at).toBe(FRIEND_A.created_at);
+  });
+
+  it('入力に未知フィールドが含まれていても保存されない', async () => {
+    setupData([FRIEND_A]);
+    const injected = { ...INPUT, admin: true, injected: 'evil' } as unknown as FriendInput;
+    const result = await updateFriend(FRIEND_A.id, injected);
+    expect(result).not.toHaveProperty('admin');
+    expect(result).not.toHaveProperty('injected');
+  });
+});
+
 // ===== deleteFriend =====
 describe('deleteFriend', () => {
   it('IDが一致するトモダチを削除してtrueを返す', async () => {

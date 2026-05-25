@@ -68,16 +68,28 @@ app.get('/api/friends/:id', async (c) => {
 
 app.post('/api/friends', async (c) => {
   try {
-    const body = await c.req.json<FriendInput>();
+    const body = await c.req.json<Record<string, unknown>>();
 
     if (!body.name || !body.nickname || !body.birthdate || !body.blood_type || !body.tagline) {
       return c.json({ message: '必須項目が不足しています。' }, 400);
     }
-    if (!['A', 'B', 'AB', 'O'].includes(body.blood_type)) {
+    if (!['A', 'B', 'AB', 'O'].includes(body.blood_type as string)) {
       return c.json({ message: '血液型は A, B, AB, O のいずれかで指定してください。' }, 400);
     }
 
-    const newFriend = await createFriend(body);
+    const input: FriendInput = {
+      name: body.name as string,
+      nickname: body.nickname as string,
+      birthdate: body.birthdate as string,
+      blood_type: body.blood_type as FriendInput['blood_type'],
+      tagline: body.tagline as string,
+      ...(body.favorite_food !== undefined && { favorite_food: body.favorite_food as string }),
+      ...(body.favorite_thing !== undefined && { favorite_thing: body.favorite_thing as string }),
+      ...(body.hobby !== undefined && { hobby: body.hobby as string }),
+      ...(body.personality_type !== undefined && { personality_type: body.personality_type as string }),
+    };
+
+    const newFriend = await createFriend(input);
     return c.json(newFriend, 201);
   } catch {
     return c.json({ message: 'データの登録に失敗しました。リクエスト内容を確認してください。' }, 400);
@@ -87,16 +99,28 @@ app.post('/api/friends', async (c) => {
 app.put('/api/friends/:id', async (c) => {
   const id = c.req.param('id');
   try {
-    const body = await c.req.json<FriendInput>();
+    const body = await c.req.json<Record<string, unknown>>();
 
     if (!body.name || !body.nickname || !body.birthdate || !body.blood_type || !body.tagline) {
       return c.json({ message: '必須項目が不足しています。' }, 400);
     }
-    if (!['A', 'B', 'AB', 'O'].includes(body.blood_type)) {
+    if (!['A', 'B', 'AB', 'O'].includes(body.blood_type as string)) {
       return c.json({ message: '血液型は A, B, AB, O のいずれかで指定してください。' }, 400);
     }
 
-    const updated = await updateFriend(id, body);
+    const input: FriendInput = {
+      name: body.name as string,
+      nickname: body.nickname as string,
+      birthdate: body.birthdate as string,
+      blood_type: body.blood_type as FriendInput['blood_type'],
+      tagline: body.tagline as string,
+      ...(body.favorite_food !== undefined && { favorite_food: body.favorite_food as string }),
+      ...(body.favorite_thing !== undefined && { favorite_thing: body.favorite_thing as string }),
+      ...(body.hobby !== undefined && { hobby: body.hobby as string }),
+      ...(body.personality_type !== undefined && { personality_type: body.personality_type as string }),
+    };
+
+    const updated = await updateFriend(id, input);
     if (!updated) {
       return c.json({ message: '指定されたIDのトモダチが見つかりません。' }, 404);
     }

@@ -152,6 +152,25 @@ describe('POST /api/friends', () => {
   });
 });
 
+// ===== POST /api/friends - インジェクション防止 =====
+describe('POST /api/friends - インジェクション防止', () => {
+  it('リクエストボディに id が含まれていても createFriend に id は渡されない', async () => {
+    createFriend.mockResolvedValue(FRIEND);
+    await post('/api/friends', { ...VALID_INPUT, id: 'evil-id' });
+    expect(createFriend).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'evil-id' })
+    );
+  });
+
+  it('リクエストボディに未知フィールドが含まれていても createFriend に渡されない', async () => {
+    createFriend.mockResolvedValue(FRIEND);
+    await post('/api/friends', { ...VALID_INPUT, admin: true });
+    expect(createFriend).not.toHaveBeenCalledWith(
+      expect.objectContaining({ admin: true })
+    );
+  });
+});
+
 // ===== PUT /api/friends/:id =====
 describe('PUT /api/friends/:id', () => {
   it('正常な入力で 200 と更新結果を返す', async () => {
@@ -178,6 +197,27 @@ describe('PUT /api/friends/:id', () => {
   it('血液型が不正な値のとき 400 を返す', async () => {
     const res = await put(`/api/friends/${FRIEND.id}`, { ...VALID_INPUT, blood_type: 'Z' });
     expect(res.status).toBe(400);
+  });
+});
+
+// ===== PUT /api/friends/:id - インジェクション防止 =====
+describe('PUT /api/friends/:id - インジェクション防止', () => {
+  it('リクエストボディに id が含まれていても updateFriend に id は渡されない', async () => {
+    updateFriend.mockResolvedValue(FRIEND);
+    await put(`/api/friends/${FRIEND.id}`, { ...VALID_INPUT, id: 'evil-id' });
+    expect(updateFriend).not.toHaveBeenCalledWith(
+      FRIEND.id,
+      expect.objectContaining({ id: 'evil-id' })
+    );
+  });
+
+  it('リクエストボディに未知フィールドが含まれていても updateFriend に渡されない', async () => {
+    updateFriend.mockResolvedValue(FRIEND);
+    await put(`/api/friends/${FRIEND.id}`, { ...VALID_INPUT, admin: true });
+    expect(updateFriend).not.toHaveBeenCalledWith(
+      FRIEND.id,
+      expect.objectContaining({ admin: true })
+    );
   });
 });
 

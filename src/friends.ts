@@ -51,18 +51,34 @@ export async function getFriendById(id: string): Promise<Friend | null> {
   return friends.find(f => f.id === id) || null;
 }
 
+function pickFriendInput(input: FriendInput): FriendInput {
+  const picked: FriendInput = {
+    name: input.name,
+    nickname: input.nickname,
+    birthdate: input.birthdate,
+    blood_type: input.blood_type,
+    tagline: input.tagline,
+  };
+  if (input.favorite_food !== undefined) picked.favorite_food = input.favorite_food;
+  if (input.favorite_thing !== undefined) picked.favorite_thing = input.favorite_thing;
+  if (input.hobby !== undefined) picked.hobby = input.hobby;
+  if (input.personality_type !== undefined) picked.personality_type = input.personality_type;
+  return picked;
+}
+
 // 新規作成
 export async function createFriend(input: FriendInput): Promise<Friend> {
   const friends = await readFriends();
   const now = new Date().toISOString();
-  
+  const safe = pickFriendInput(input);
+
   const newFriend: Friend = {
     id: crypto.randomUUID(),
-    ...input,
+    ...safe,
     created_at: now,
     updated_at: now
   };
-  
+
   friends.push(newFriend);
   await writeFriends(friends);
   return newFriend;
@@ -75,12 +91,13 @@ export async function updateFriend(id: string, input: FriendInput): Promise<Frie
   if (idx === -1) return null;
 
   const now = new Date().toISOString();
+  const safe = pickFriendInput(input);
   const updatedFriend: Friend = {
     ...friends[idx],
-    ...input,
+    ...safe,
     updated_at: now
   };
-  
+
   friends[idx] = updatedFriend;
   await writeFriends(friends);
   return updatedFriend;
