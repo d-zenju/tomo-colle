@@ -47,7 +47,7 @@ app.get('/api/personality', (c) => {
 app.get('/api/friends', async (c) => {
   try {
     const friends = await getAllFriends();
-    return c.json(friends);
+    return c.json({ data: friends });
   } catch {
     return c.json({ message: 'データの取得に失敗しました。' }, 500);
   }

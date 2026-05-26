@@ -695,6 +695,14 @@
     t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
   }
 
+  // ===== Helpers =====
+  // サーバーからのレスポンスを正規化して配列を返す（旧: Friend[] 直接 / 新: { data: Friend[] } に対応）
+  function normalizeFriendsResponse(body) {
+    if (Array.isArray(body)) return body;
+    if (body && Array.isArray(body.data)) return body.data;
+    return [];
+  }
+
   // ===== ナビゲーション =====
   function showView(name) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -716,7 +724,8 @@
     try {
       const res = await fetch(`${API_BASE}/api/friends`);
       if (!res.ok) throw new Error();
-      friends = await res.json();
+      const body = await res.json();
+      friends = normalizeFriendsResponse(body);
       renderFriends();
     } catch {
       grid.innerHTML = `<div class="empty-state">

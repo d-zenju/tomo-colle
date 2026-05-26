@@ -24,9 +24,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Friend'
+                $ref: '#/components/schemas/FriendsResponse'
         '500':
           description: サーバーエラー
           content:
@@ -344,6 +342,16 @@ components:
         - personality_type
         - group
         - description
+
+    FriendsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Friend'
+      required:
+        - data
 
     ErrorResponse:
       type: object

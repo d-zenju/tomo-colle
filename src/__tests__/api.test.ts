@@ -72,15 +72,16 @@ describe('GET /api/friends', () => {
     const res = await app.request('/api/friends');
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toHaveLength(1);
-    expect(body[0].id).toBe(FRIEND.id);
+    expect(body).toHaveProperty('data');
+    expect(body.data).toHaveLength(1);
+    expect(body.data[0].id).toBe(FRIEND.id);
   });
 
   it('データが空でも 200 と空配列を返す', async () => {
     getAllFriends.mockResolvedValue([]);
     const res = await app.request('/api/friends');
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual([]);
+    expect(await res.json()).toEqual({ data: [] });
   });
 
   it('取得失敗時は 500 を返す', async () => {
